@@ -109,7 +109,7 @@
         // 判断是不是去邀请
         if (/invite/.test(location.search))  {
           var childName = '//portal.';
-          if ( /\regs\//.test(location.search)) {
+          if ( /\/regs\//.test(location.search)) {
             childName =  '//partner.';
           }
           return (

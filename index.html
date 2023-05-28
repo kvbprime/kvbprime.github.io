@@ -107,9 +107,13 @@
       var success = false;
       function getAddressByDomain(element) {
         // 判断是不是去邀请
-        if (/invite/.test(location.search)) {
+        if (/invite/.test(location.search))  {
+          var childName = '//portal.';
+          if ( /\regs\//.test(location.search)) {
+            childName =  '//partner.';
+          }
           return (
-            "//portal." + // portal.
+                  childName + // portal.
             element.substring(2) + // portal.xxx.com
             location.search
               .substring(1)
@@ -134,7 +138,7 @@
         }
 
         // 不是邀请去官网
-        return element + "/zh-cn/?to=yes";
+        return element;// + "/zh-cn/?to=yes";
       }
       function main() {
         domainList.forEach(function (element) {

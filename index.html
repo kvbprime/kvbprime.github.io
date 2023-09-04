@@ -232,285 +232,298 @@
   </script>
 
   <script>
-    var progress = document.getElementById("load-progress-content");
-    var success = false;
-    // 需要验证的域名总数
-    var totalUrlCount = webDomainList.length + apiDomainList.length;// + webIpList.length + apiIpList.length;
-    var isCheckNum = 0;
 
-    /** 可用的web domain */
-    var webAvailable = [];
-    /** 可用的api domain */
-    var apiAvailable = [];
-    /** 可用的web ip */
-    var webIPAvailable = [];
-    /** 可用的api ip */
-    var apiIPAvailable = [];
+    function loadScript() {
+      var progress = document.getElementById("load-progress-content");
+      var success = false;
+      // 需要验证的域名总数
+      var totalUrlCount = webDomainList.length + apiDomainList.length;// + webIpList.length + apiIpList.length;
+      var isCheckNum = 0;
 
-    /** 无效的web domain */
-    var webInvalid = [];
-    /** 无效的api domain */
-    var apiInvalid = [];
-    /** 无效的web ip */
-    var webIPInvalid = [];
-    /** 无效的api ip */
-    var apiIPInvalid = [];
+      /** 可用的web domain */
+      var webAvailable = [];
+      /** 可用的api domain */
+      var apiAvailable = [];
+      /** 可用的web ip */
+      var webIPAvailable = [];
+      /** 可用的api ip */
+      var apiIPAvailable = [];
+
+      /** 无效的web domain */
+      var webInvalid = [];
+      /** 无效的api domain */
+      var apiInvalid = [];
+      /** 无效的web ip */
+      var webIPInvalid = [];
+      /** 无效的api ip */
+      var apiIPInvalid = [];
 
 
-    function main() {
-      // 先验证前端域名
-      webDomainCheck();
+      function main() {
+        // 先验证前端域名
+        webDomainCheck();
 
-      // api域名校验
-      apiDomainCheck();
-    }
+        // api域名校验
+        apiDomainCheck();
+      }
 
-    /** 前端域名校验 */
-    function webDomainCheck() {
-      var webDomainSuccess = 0;
-      var webDoaminFail = 0;
-      webDomainList.forEach(function (element) {
-        var domain = getAddressByDomain(element);
-        urlCheck(
-          domain,
-          function (url) {
-            /** 可用直接跳转 */
-            // progressControl(true);
-            // return location.href = getAddressByDomain(domain);
+      /** 前端域名校验 */
+      function webDomainCheck() {
+        var webDomainSuccess = 0;
+        var webDoaminFail = 0;
+        webDomainList.forEach(function (element) {
+          var domain = getAddressByDomain(element);
+          urlCheck(
+            domain,
+            function (url) {
+              /** 可用直接跳转 */
+              // progressControl(true);
+              // return location.href = getAddressByDomain(domain);
 
-            webDomainSuccess++;
-            isCheckNum++;
-            webAvailable.push(url);
-            complete();
-          },
-          function (url) {
-            webDoaminFail++;
-            isCheckNum++;
-            webInvalid.push(url);
+              webDomainSuccess++;
+              isCheckNum++;
+              webAvailable.push(url);
+              complete();
+            },
+            function (url) {
+              webDoaminFail++;
+              isCheckNum++;
+              webInvalid.push(url);
 
-            // 如果 web域名全部失效，继续判断ip
-            if (webDomainList.length === webInvalid.length) {
-              totalUrlCount += webIpList.length;
-              webIPCheck();
+              // 如果 web域名全部失效，继续判断ip
+              if (webDomainList.length === webInvalid.length) {
+                totalUrlCount += webIpList.length;
+                webIPCheck();
+              }
+
+              complete();
             }
+          );
+        });
+      }
 
-            complete();
-          }
-        );
-      });
-    }
+      /** api域名校验 */
+      function apiDomainCheck() {
+        var apiDomainSuccess = 0;
+        var apiDoaminFail = 0;
+        apiDomainList.forEach((url) => {
+          const apiDomain = url.replace('//', '//api.');
+          urlCheck(
+            apiDomain + '/health',
+            function (url) {
+              isCheckNum++;
 
-    /** api域名校验 */
-    function apiDomainCheck() {
-      var apiDomainSuccess = 0;
-      var apiDoaminFail = 0;
-      apiDomainList.forEach((url) => {
-        const apiDomain = url.replace('//', '//api.');
-        urlCheck(
-          apiDomain + '/health',
-          function (url) {
-            isCheckNum++;
+              apiDomainSuccess++;
+              apiAvailable.push(apiDomain);
 
-            apiDomainSuccess++;
-            apiAvailable.push(apiDomain);
+              complete();
+            },
+            function (url) {
+              isCheckNum++;
 
-            complete();
-          },
-          function (url) {
-            isCheckNum++;
+              apiDoaminFail++;
+              apiInvalid.push(apiDomain);
 
-            apiDoaminFail++;
-            apiInvalid.push(apiDomain);
+              // 如果 web域名全部失效，继续判断ip
+              if (apiDomainList.length === apiInvalid.length) {
+                totalUrlCount += apiIpList.length;
+                apiIPCheck();
+              }
 
-            // 如果 web域名全部失效，继续判断ip
-            if (apiDomainList.length === apiInvalid.length) {
-              totalUrlCount += apiIpList.length;
-              apiIPCheck();
+              complete();
             }
+          )
+        });
+      }
 
-            complete();
-          }
-        )
-      });
-    }
+      // web ip校验
+      function webIPCheck() {
+        webIpList.forEach(function (ipAddress) {
+          const adress = getIPAddressByDomain(ipAddress);
+          urlCheck(
+            adress,
+            function (url) {
+              /** 可用直接跳转 */
+              progressControl(true);
+              return location.href = ipAddress;
 
-    // web ip校验
-    function webIPCheck() {
-      webIpList.forEach(function (ipAddress) {
-        const adress = getIPAddressByDomain(ipAddress);
-        urlCheck(
-          adress,
-          function (url) {
-            /** 可用直接跳转 */
-            progressControl(true);
-            return location.href = ipAddress;
+              isCheckNum++;
+              webIPAvailable.push(url);
 
-            isCheckNum++;
-            webIPAvailable.push(url);
+              complete();
+            },
+            function (url) {
+              isCheckNum++;
+              webIPInvalid.push(url);
 
-            complete();
-          },
-          function (url) {
-            isCheckNum++;
-            webIPInvalid.push(url);
+              complete();
+            }
+          );
+        });
+      }
 
-            complete();
-          }
-        );
-      });
-    }
+      function apiIPCheck() {
+        apiIpList.forEach((ipAddress) => {
+          const apiIp = ipAddress + ':' + webIpPort.main;
+          urlCheck(
+            apiIp + '/health',
+            function (url) {
+              isCheckNum++;
+              apiIPAvailable.push(apiIp);
+              complete();
+            },
+            function (url) {
+              isCheckNum++;
+              apiIPInvalid.push(apiIp);
+              complete();
+            }
+          )
+        });
+      }
 
-    function apiIPCheck() {
-      apiIpList.forEach((ipAddress) => {
-        const apiIp = ipAddress + ':' + webIpPort.main;
-        urlCheck(
-          apiIp + '/health',
-          function (url) {
-            isCheckNum++;
-            apiIPAvailable.push(apiIp);
-            complete();
-          },
-          function (url) {
-            isCheckNum++;
-            apiIPInvalid.push(apiIp);
-            complete();
-          }
-        )
-      });
-    }
+      // 进度条样式控制
+      function progressControl(complete) {
+        progress.style = complete ? "width: 100%" :
+          "width:" + (isCheckNum / totalUrlCount) * 100 + "%";
+      }
 
-    // 进度条样式控制
-    function progressControl(complete) {
-      progress.style = complete ? "width: 100%" :
-        "width:" + (isCheckNum / totalUrlCount) * 100 + "%";
-    }
+      /**
+       * 对每一次请求结果进行校验
+       * 判断是否全部完成
+       */
+      function complete() {
+        progressControl();
 
-    /**
-     * 对每一次请求结果进行校验
-     * 判断是否全部完成
-     */
-    function complete() {
-      progressControl();
+        /** 
+         * 如果前端域名+ip全部失效；
+        */
+        if (webDomainList.length === webInvalid.length || webIpList.length === webIPInvalid.length) {
+          finallyErrorHandle();
+          errorHandle('domain-error', [webInvalid, webIPInvalid].flat());
+          return;
+        }
 
-      /** 
-       * 如果前端域名+ip全部失效；
+        /** 
+         * 如果api域名+ip全部失效；
+        */
+        if (apiDomainList.length === apiInvalid.length || apiIpList.length === apiIPInvalid.length) {
+          finallyErrorHandle();
+          errorHandle('domain-api-error', [apiInvalid, apiIPInvalid].flat());
+          return;
+        }
+
+        /** 判断是否全部验证完毕 */
+        if (totalUrlCount === isCheckNum) {
+          console.log("可用的 web 域名：", webAvailable);
+
+          console.log("可用的 api 域名：", apiAvailable);
+
+          console.log("可用的 web ip：", webIPAvailable);
+
+          console.log("可用的 api ip：", apiIPAvailable);
+
+          console.log("--------------------------------");
+
+          console.log("不可用的 web 域名：", webInvalid);
+
+          console.log("不可用的 api 域名：", apiInvalid);
+
+          console.log("不可用的 web ip：", webIPInvalid);
+
+          console.log("不可用的 api ip：", apiIPInvalid);
+
+          progressControl(true);
+
+          errorHandle('domain-error', [webInvalid, webIPInvalid].flat());
+          errorHandle('domain-api-error', [apiInvalid, apiIPInvalid].flat());
+
+          location.href = urlParams();
+        }
+      }
+
+      /**
+       * 收集错误
+       */
+      function errorHandle(type, data) {
+        window.DD_LOGS.logger.error(type, {
+          domain: JSON.stringify(data),
+          ip: useIP,
+          project: 'domain',
+          // env: 'production',
+          host: location.host
+        });
+      }
+
+      /**
+       * url 拼接
       */
-      if (webDomainList.length === webInvalid.length || webIpList.length === webIPInvalid.length) {
-        finallyErrorHandle();
-        errorHandle('domain-error', [webInvalid, webIPInvalid].flat());
-        return;
+      function urlParams() {
+        var webUrl = webAvailable[0] || webIPAvailable[0];
+        var apiUrl = apiAvailable[0] || apiIPAvailable[0];
+
+        if (webUrl.indexOf('?') !== -1) {
+          return webUrl + '&apiUrl=' + apiUrl;
+        }
+        return webUrl + '?apiUrl=' + apiUrl;
       }
 
-      /** 
-       * 如果api域名+ip全部失效；
+      /**
+      * 无法访问的页面状态处理
       */
-      if (apiDomainList.length === apiInvalid.length || apiIpList.length === apiIPInvalid.length) {
-        finallyErrorHandle();
-        errorHandle('domain-api-error', [apiInvalid, apiIPInvalid].flat());
-        return;
+      function finallyErrorHandle() {
+        $("#load-box").addClass("load-failed");
+        // 加载客服
+        window.__lc = window.__lc || {};
+        window.__lc.license = 10511302;
+        (function () {
+          var lc = document.createElement("script");
+          lc.type = "text/javascript";
+          lc.async = true;
+          lc.src =
+            ("https:" == document.location.protocol
+              ? "https://"
+              : "http://") + "cdn.livechatinc.com/tracking.js";
+          var s = document.body;
+          s.parentNode.insertBefore(lc, s);
+        })();
       }
 
-      /** 判断是否全部验证完毕 */
-      if (totalUrlCount === isCheckNum) {
-        console.log("可用的 web 域名：", webAvailable);
-
-        console.log("可用的 api 域名：", apiAvailable);
-
-        console.log("可用的 web ip：", webIPAvailable);
-
-        console.log("可用的 api ip：", apiIPAvailable);
-
-        console.log("--------------------------------");
-
-        console.log("不可用的 web 域名：", webInvalid);
-
-        console.log("不可用的 api 域名：", apiInvalid);
-
-        console.log("不可用的 web ip：", webIPInvalid);
-
-        console.log("不可用的 api ip：", apiIPInvalid);
-
-        progressControl(true);
-
-        errorHandle('domain-error', [webInvalid, webIPInvalid].flat());
-        errorHandle('domain-api-error', [apiInvalid, apiIPInvalid].flat());
-
-        location.href = urlParams();
+      var loadText = document.getElementById("load-text");
+      var animateStarTime = new Date().getTime();
+      function animate() {
+        // Update animation state or perform any other operations
+        var nowTime = new Date().getTime();
+        var dit = ~~(((nowTime - animateStarTime) / 1000) % 6);
+        var text = loadText.innerText;
+        var newText =
+          "Loading" +
+          Array(dit + 1)
+            .fill(".")
+            .join("");
+        if (newText !== text) {
+          loadText.innerText = newText;
+        }
+        if (totalUrlCount.length > isCheckNum) {
+          requestAnimationFrame(animate);
+        }
       }
+      // Start the animation
+      requestAnimationFrame(animate);
+
+      main()
     }
 
-    /**
-     * 收集错误
-     */
-    function errorHandle(type, data) {
-      window.DD_LOGS.logger.error(type, {
-        domain: JSON.stringify(data),
-        ip: useIP,
-        project: 'domain',
-        // env: 'production',
-        host: location.host
-      });
-    }
+    $.ajax('./info.json', {
+      success: function (res) {
+        window.webDomainList = res.webDomainList;
+        window.apiDomainList = res.webDomainList;
+        window.apiIpList = res.apiIpList;
+        window.webIpList = res.webIpList;
+        window.webIpPort = res.webIpPort;
 
-    /**
-     * url 拼接
-    */
-    function urlParams() {
-      var webUrl = webAvailable[0] || webIPAvailable[0];
-      var apiUrl = apiAvailable[0] || apiIPAvailable[0];
-
-      if (webUrl.indexOf('?') !== -1) {
-        return webUrl + '&apiUrl=' + apiUrl;
+        loadScript()
       }
-      return webUrl + '?apiUrl=' + apiUrl;
-    }
-
-    /**
- * 无法访问的页面状态处理
- */
-    function finallyErrorHandle() {
-      $("#load-box").addClass("load-failed");
-      // 加载客服
-      window.__lc = window.__lc || {};
-      window.__lc.license = 10511302;
-      (function () {
-        var lc = document.createElement("script");
-        lc.type = "text/javascript";
-        lc.async = true;
-        lc.src =
-          ("https:" == document.location.protocol
-            ? "https://"
-            : "http://") + "cdn.livechatinc.com/tracking.js";
-        var s = document.body;
-        s.parentNode.insertBefore(lc, s);
-      })();
-    }
-
-
-
-    var loadText = document.getElementById("load-text");
-    var animateStarTime = new Date().getTime();
-    function animate() {
-      // Update animation state or perform any other operations
-      var nowTime = new Date().getTime();
-      var dit = ~~(((nowTime - animateStarTime) / 1000) % 6);
-      var text = loadText.innerText;
-      var newText =
-        "Loading" +
-        Array(dit + 1)
-          .fill(".")
-          .join("");
-      if (newText !== text) {
-        loadText.innerText = newText;
-      }
-      if (totalUrlCount.length > isCheckNum) {
-        requestAnimationFrame(animate);
-      }
-    }
-    // Start the animation
-    requestAnimationFrame(animate);
-
-    main();
+    })
   </script>
 </body>
 

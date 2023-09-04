@@ -214,7 +214,7 @@
           element + // portal.
           ':' +
           port
-        ); 
+        );
       }
 
       if (/portal/.test(location.search)) {
@@ -223,7 +223,7 @@
           element + // portal.
           ':' +
           port
-        ); 
+        );
       }
 
       // 默认去官网
@@ -287,13 +287,14 @@
             webDoaminFail++;
             isCheckNum++;
             webInvalid.push(url);
-            complete();
 
             // 如果 web域名全部失效，继续判断ip
             if (webDomainList.length === webInvalid.length) {
               totalUrlCount += webIpList.length;
-              return webIPCheck();
+              webIPCheck();
             }
+
+            complete();
           }
         );
       });
@@ -309,14 +310,14 @@
           apiDomain + '/health',
           function (url) {
             isCheckNum++;
-            complete();
 
             apiDomainSuccess++;
             apiAvailable.push(apiDomain);
+
+            complete();
           },
           function (url) {
             isCheckNum++;
-            complete();
 
             apiDoaminFail++;
             apiInvalid.push(apiDomain);
@@ -324,8 +325,10 @@
             // 如果 web域名全部失效，继续判断ip
             if (apiDomainList.length === apiInvalid.length) {
               totalUrlCount += apiIpList.length;
-              return apiIPCheck();
+              apiIPCheck();
             }
+
+            complete();
           }
         )
       });
@@ -343,15 +346,15 @@
             return location.href = ipAddress;
 
             isCheckNum++;
-            complete();
-
             webIPAvailable.push(url);
+
+            complete();
           },
           function (url) {
             isCheckNum++;
-            complete();
-
             webIPInvalid.push(url);
+
+            complete();
           }
         );
       });
@@ -364,15 +367,13 @@
           apiIp + '/health',
           function (url) {
             isCheckNum++;
-            complete();
-
             apiIPAvailable.push(apiIp);
+            complete();
           },
           function (url) {
             isCheckNum++;
-            complete();
-
             apiIPInvalid.push(apiIp);
+            complete();
           }
         )
       });

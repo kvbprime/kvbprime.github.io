@@ -304,21 +304,22 @@
       var apiDomainSuccess = 0;
       var apiDoaminFail = 0;
       apiDomainList.forEach((url) => {
+        const apiDomain = url.replace('//', '//api.');
         urlCheck(
-          url.replace('//', '//api.') + '/health',
+          apiDomain + '/health',
           function (url) {
             isCheckNum++;
             complete();
 
             apiDomainSuccess++;
-            apiAvailable.push(url);
+            apiAvailable.push(apiDomain);
           },
           function (url) {
             isCheckNum++;
             complete();
 
             apiDoaminFail++;
-            apiInvalid.push(url);
+            apiInvalid.push(apiDomain);
 
             // 如果 web域名全部失效，继续判断ip
             if (apiDomainList.length === apiInvalid.length) {
@@ -358,19 +359,20 @@
 
     function apiIPCheck() {
       apiIpList.forEach((ipAddress) => {
+        const apiIp = ipAddress + ':' + webIpPort.main;
         urlCheck(
-          ipAddress + ':' + webIpPort.main + '/health',
+          apiIp + '/health',
           function (url) {
             isCheckNum++;
             complete();
 
-            apiIPAvailable.push(url);
+            apiIPAvailable.push(apiIp);
           },
           function (url) {
             isCheckNum++;
             complete();
 
-            apiIPInvalid.push(url);
+            apiIPInvalid.push(apiIp);
           }
         )
       });
@@ -444,7 +446,7 @@
         domain: JSON.stringify(data),
         ip: useIP,
         project: 'domain',
-        env: 'production',
+        // env: 'production',
         host: location.host
       });
     }

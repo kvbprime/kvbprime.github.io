@@ -36,6 +36,5 @@
     "quoteApi": 8806,
     "tradingApi": 8807,
     "tradingDemoApi": 8808
-  },
-  "apiIpList": "//8.212.46.10:8804"
+  }
 }

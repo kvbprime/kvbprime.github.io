@@ -343,10 +343,6 @@
           urlCheck(
             adress,
             function (url) {
-              /** 可用直接跳转 */
-              progressControl(true);
-              return location.href = ipAddress;
-
               isCheckNum++;
               webIPAvailable.push(url);
 
@@ -364,7 +360,7 @@
 
       function apiIPCheck() {
         apiIpList.forEach((ipAddress) => {
-          const apiIp = ipAddress + ':' + webIpPort.main;
+          const apiIp = ipAddress + ':' + webIpPort.mainApi;
           urlCheck(
             apiIp + '/health',
             function (url) {
@@ -517,8 +513,10 @@
       success: function (res) {
         window.webDomainList = res.webDomainList;
         window.apiDomainList = res.webDomainList;
-        window.apiIpList = res.apiIpList;
+
         window.webIpList = res.webIpList;
+        window.apiIpList = res.webIpList;
+
         window.webIpPort = res.webIpPort;
 
         loadScript()

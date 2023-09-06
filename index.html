@@ -97,7 +97,6 @@
   <!-- log -->
   <script type="text/javascript" src="https://www.datadoghq-browser-agent.com/us1/v4/datadog-logs.js"></script>
   <!-- domain -->
-  <script src="./info.js"></script>
   <script>
     var useIP = "";
 
@@ -388,6 +387,11 @@
        * 判断是否全部完成
        */
       function complete() {
+        if ([webAvailable, webIPAvailable].flat()[0] && [apiAvailable, apiIPAvailable].flat()[0] ) {
+          progressControl(true);
+          return location.href = urlParams();
+        }
+
         progressControl();
 
         /** 

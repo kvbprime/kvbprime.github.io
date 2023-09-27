@@ -397,7 +397,7 @@
         /** 
          * 如果前端域名+ip全部失效；
         */
-        if (webDomainList.length === webInvalid.length || webIpList.length === webIPInvalid.length) {
+        if (webDomainList.length === webInvalid.length && webIpList.length === webIPInvalid.length) {
           finallyErrorHandle();
           errorHandle('domain-error', [webInvalid, webIPInvalid].flat());
           return;
@@ -406,7 +406,7 @@
         /** 
          * 如果api域名+ip全部失效；
         */
-        if (apiDomainList.length === apiInvalid.length || apiIpList.length === apiIPInvalid.length) {
+        if (apiDomainList.length === apiInvalid.length && apiIpList.length === apiIPInvalid.length) {
           finallyErrorHandle();
           errorHandle('domain-api-error', [apiInvalid, apiIPInvalid].flat());
           return;

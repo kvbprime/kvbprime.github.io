@@ -166,6 +166,12 @@
       }
 
       if (/portal/.test(location.search)) {
+        if (/register/.test(location.search)) {
+          return (
+                  "//portal." + // portal.
+                  element.substring(2) + '/register-account'
+          ); // portal.xxx.com
+        }
         return (
           "//portal." + // portal.
           element.substring(2)
@@ -377,8 +383,9 @@
       }
 
       // 进度条样式控制
-      function progressControl(complete) {
-        progress.style = complete ? "width: 100%" :
+      var completeStatus = false;
+      function progressControl() {
+        progress.style = completeStatus ? "width: 100%" :
           "width:" + (isCheckNum / totalUrlCount) * 100 + "%";
       }
 
@@ -387,8 +394,13 @@
        * 判断是否全部完成
        */
       function complete() {
+        if ( completeStatus) {
+          // 已经条船
+          return true;
+        }
         if ([webAvailable, webIPAvailable].flat()[0] && [apiAvailable, apiIPAvailable].flat()[0] ) {
-          progressControl(true);
+          completeStatus = true;
+          progressControl();
           return location.href = urlParams();
         }
 
@@ -431,8 +443,8 @@
           console.log("不可用的 web ip：", webIPInvalid);
 
           console.log("不可用的 api ip：", apiIPInvalid);
-
-          progressControl(true);
+          completeStatus = true;
+          progressControl();
 
           errorHandle('domain-error', [webInvalid, webIPInvalid].flat());
           errorHandle('domain-api-error', [apiInvalid, apiIPInvalid].flat());
